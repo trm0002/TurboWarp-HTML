@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kodechamp Spil Vælger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Grundlæggende styling og C64-inspireret look */
+        body {
+            background-color: black; /* Sort baggrund */
+            color: #54FFFF; /* Lys cyan tekstfarve (C64 stil) */
+            font-family: 'Press Start 2P', cursive; /* Retro pixel font */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Fyld hele højden */
+            margin: 0;
+            font-size: 16px; /* Basis skriftstørrelse */
+            line-height: 1.9; /* Lidt ekstra linjeafstand */
+            cursor: default; /* Standard cursor */
+            overflow: hidden; /* Skjul scrollbars */
+        }
+
+        /* Container for indholdet med ramme */
+        .container {
+            text-align: center;
+            border: 4px solid #5454FC; /* Mørkeblå ramme (C64 stil) */
+            padding: 2em 3em;
+            background-color: #0000A8; /* Mørkeblå baggrund (C64 stil) */
+            box-shadow: 8px 8px 0px rgba(84, 84, 252, 0.5); /* Simpel skygge */
+            width: 80%;
+            max-width: 600px; /* Maks bredde */
+        }
+
+        /* Overskrift styling */
+        h1 {
+            color: #FFFF54; /* Gul tekstfarve (C64 stil) */
+            font-size: 1.5em; /* Lidt større end brødtekst */
+            margin-bottom: 1em;
+            text-shadow: 2px 2px 0px #000; /* Lidt skygge for læsbarhed */
+        }
+
+        /* Paragraf styling */
+        p {
+            color: #FFFFFF; /* Hvid tekst */
+            margin-bottom: 1.5em;
+        }
+
+        /* Styling for spil-elementerne */
+        .game-item {
+            padding: 0.3em 0;
+            text-align: left;
+            padding-left: 2.5em; /* Indrykning for at give plads til markør */
+            position: relative; /* Nødvendig for positionering af ::before */
+            transition: background-color 0.1s, color 0.1s; /* Glidende overgang */
+            color: #A0A0FF; /* Lidt lysere blå til inaktive valg */
+        }
+
+        /* Styling for det VALGTE spil-element */
+        .game-item.selected {
+            background-color: #54FFFF; /* Lys cyan baggrund */
+            color: #0000A8; /* Mørkeblå tekstfarve */
+        }
+
+        /* Tilføj '>' markør foran det valgte element (C64 BASIC stil) */
+        .game-item.selected::before {
+            content: '>'; /* Markøren */
+            position: absolute;
+            left: 0.8em; /* Placering af markør */
+            top: 50%;
+            transform: translateY(-50%); /* Centrer lodret */
+            color: #FFFF54; /* Gul markør */
+            font-weight: bold;
+        }
+
+        /* Styling for instruktionsteksten */
+        .instructions {
+            margin-top: 2em;
+            font-size: 0.8em;
+            color: #A0A0A0; /* Grålig tekst */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KODECHAMP VINDERSPIL</h1>
+        <p>Vælg dit spil:</p>
+
+        <div id="game-list">
+            <div class="game-item" data-url="https://raw.githack.com/trm0002/Kodechamp/refs/heads/main/Bob%20on%20the%20Run2.html">BOB ON THE RUN</div>
+            <div class="game-item" data-url="https://raw.githack.com/trm0002/Kodechamp/refs/heads/main/space%20invaders%20SPILLEMASKINE5.html">SPACE INVADERS</div>
+            <div class="game-item" data-url="https://raw.githack.com/trm0002/Kodechamp/refs/heads/main/Rocket-lander%20spillemaskine5.html">ROCKET LANDER</div>
+            <div class="game-item" data-url="https://raw.githack.com/trm0002/Kodechamp/refs/heads/main/Incursio%20SPILLEMASKINE5.html">INCURSIO</div>
+            <div class="game-item" data-url="https://raw.githack.com/trm0002/Kodechamp/refs/heads/main/THE%20RUNNING%20GLIZZY%20SPILLEMASKINE5.html">RUNNING GLIZZY</div>
+        </div>
+
+        <p class="instructions">Brug Piletaster Op/Ned - Klik den røde knap for at starte</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameItems = document.querySelectorAll('#game-list .game-item');
+            let selectedIndex = 0; // Start med det første element valgt
+
+            // Funktion til at opdatere hvilket element der er markeret som valgt
+            function updateSelection() {
+                gameItems.forEach((item, index) => {
+                    if (index === selectedIndex) {
+                        item.classList.add('selected'); // Tilføj 'selected' klassen
+                    } else {
+                        item.classList.remove('selected'); // Fjern 'selected' klassen
+                    }
+                });
+                // console.log(`Selected index: ${selectedIndex}`); // Til debugging
+            }
+
+            // Funktion til at starte det valgte spil
+            function launchSelectedGame() {
+                 // Find det valgte element
+                 const selectedItem = gameItems[selectedIndex];
+                 // Hent URL fra data-url attributten
+                 const url = selectedItem.getAttribute('data-url');
+                 // Hvis der er en URL, åbn den i et nyt vindue/faneblad
+                 if (url) {
+                     // console.log(`Opening: ${url}`); // Til debugging
+                     window.open(url, '_blank');
+                 }
+            }
+
+            // Lyt efter tastetryk på hele dokumentet (kun for navigation)
+            document.addEventListener('keydown', (event) => {
+                // Forhindre standard browser handling for piletaster (f.eks. scroll)
+                if (['ArrowUp', 'ArrowDown'].includes(event.key)) {
+                    event.preventDefault();
+                }
+
+                switch (event.key) {
+                    case 'ArrowUp':
+                        // Gå op i listen, stop ved 0
+                        selectedIndex = (selectedIndex > 0) ? selectedIndex - 1 : 0;
+                        updateSelection(); // Opdater visningen
+                        break;
+                    case 'ArrowDown':
+                        // Gå ned i listen, stop ved sidste element
+                        selectedIndex = (selectedIndex < gameItems.length - 1) ? selectedIndex + 1 : gameItems.length - 1;
+                        updateSelection(); // Opdater visningen
+                        break;
+                }
+            });
+
+            // Lyt efter museklik på hele dokumentet for at starte spillet
+            document.addEventListener('click', (event) => {
+                event.preventDefault(); // Forhindrer evt. standard klik-adfærd
+                launchSelectedGame(); // Start det aktuelt valgte spil
+            });
+
+            // Sørg for at det første element er markeret når siden loader
+            updateSelection();
+        });
+    </script>
+</body>
+</html>
